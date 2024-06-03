@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document Upload</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: row;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            height: 100vh;
+        }
+        .menu-container {
+            width: 300px; /* 가로 길이 조정 */
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            height: 100%;
+            position: relative;
+        }
+        .menu {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+        .menu li {
+            margin: 5px 10px;
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+        }
+        .menu li:hover {
+            color: darkblue;
+        }
+        .menu .selected {
+            font-weight: bold;
+            color: red;
+        }
+        .content {
+            display: none;
+            margin-left: 20px;
+            flex-grow: 1;
+            padding: 20px;
+            position: relative;
+        }
+        .buttons {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 20px);
+            text-align: center;
+        }
+        .action-buttons {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+        }
+        textarea {
+            width: 66.66%; /* 텍스트 박스 너비 조정 */
+            box-sizing: border-box;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const content = document.getElementById('content');
+            const sectionInput = document.getElementById('section');
+            const menuItems = document.querySelectorAll('.menu li');
+
+            function showContent(section) {
+                content.style.display = 'block';
+                sectionInput.value = section;
+
+                menuItems.forEach(item => {
+                    item.classList.remove('selected');
+                    if (item.textContent === section) {
+                        item.classList.add('selected');
+                    }
+                });
+            }
+
+            window.showContent = showContent;
+
+            window.addMenuItem = function() {
+                const newItem = prompt("Enter the new menu item:");
+                if (newItem) {
+                    const menu = document.querySelector('.menu');
+                    const li = document.createElement('li');
+                    li.textContent = newItem;
+                    li.setAttribute('onclick', `showContent("${newItem}")`);
+                    menu.appendChild(li);
+                }
+            };
+
+            window.deleteMenuItem = function() {
+                const itemToDelete = prompt("Enter the menu item to delete:");
+                if (itemToDelete) {
+                    const menu = document.querySelector('.menu');
+                    const items = menu.getElementsByTagName('li');
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].textContent === itemToDelete) {
+                            menu.removeChild(items[i]);
+                            break;
+                        }
+                    }
+                }
+            };
+
+            window.editMenuItem = function() {
+                const itemToEdit = prompt("Enter the menu item to edit:");
+                if (itemToEdit) {
+                    const newMenuItem = prompt("Enter the new value:");
+                    if (newMenuItem) {
+                        const menu = document.querySelector('.menu');
+                        const items = menu.getElementsByTagName('li');
+                        for (let i = 0; i < items.length; i++) {
+                            if (items[i].textContent === itemToEdit) {
+                                items[i].textContent = newMenuItem;
+                                items[i].setAttribute('onclick', `showContent("${newMenuItem}")`);
+                                break;
+                            }
+                        }
+                    }
+                }
+            };
+
+            document.getElementById('cancel-button').addEventListener('click', function() {
+                content.style.display = 'none';
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="menu-container">
+        <ul class="menu">
+            <li onclick="showContent('1.01 Scoping Questionnaire')">1.01 Scoping Questionnaire</li>
+            <!-- Add more items as needed -->
+        </ul>
+        <div class="buttons">
+            <button onclick="addMenuItem()">Add</button>
+            <button onclick="deleteMenuItem()">Delete</button>
+            <button onclick="editMenuItem()">Edit</button>
+        </div>
+    </div>
+
+    <div id="content" class="content">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="section" name="section">
+            <label for="file">Choose file:</label>
+            <input type="file" id="file" name="file">
+            <br><br>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4"></textarea>
+            <br><br>
+            <label for="description2">Additional Information:</label>
+            <textarea id="description2" name="description2" rows="4"></textarea>
+            <br><br>
+            <div class="action-buttons">
+                <input type="submit" value="Save">
+                <button type="button" id="cancel-button">Cancel</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
